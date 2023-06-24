@@ -1,0 +1,7 @@
+____*
+build
+node_modules
+package-lock.json
+src/data/*.*
+src/conf/*.*
+!src/conf/template.conf.json

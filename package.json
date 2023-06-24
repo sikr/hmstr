@@ -1,0 +1,21 @@
+{
+  "name": "hmstr",
+  "version": "0.0.1",
+  "description": "Obtain smarthome data via MQTT and forward it to Graphite Carbon Cache",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SiKr (simon.kruska@googlemail.com)",
+  "license": "ISC",
+  "dependencies": {
+    "mqtt": "^4.3.7"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "@types/ws": "^8.5.4",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.0.3"
+  }
+}
