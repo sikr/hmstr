@@ -2,11 +2,18 @@ import { Socket, createConnection } from "net";
 import { EventEmitter } from "events";
 export { GraphiteClient };
 export { GraphiteRecord };
+export { GraphiteConfig };
+
+interface GraphiteConfig {
+  host: string;
+  port: number;
+  prefix: string;
+}
 
 interface GraphiteRecord {
   timestamp: number;
   path: string;
-  value: string;
+  value: number;
 }
 
 class GraphiteClient extends EventEmitter {
@@ -18,13 +25,13 @@ class GraphiteClient extends EventEmitter {
   reconnectTimeout: number = 10;
   socket: Socket;
 
-  constructor(host: string, port: number, prefix: string) {
+  constructor(config: GraphiteConfig) {
     super();
 
     this.connected = false;
-    this.host = host || "127.0.0.1";
-    this.port = port || 2003;
-    this.prefix = prefix || "";
+    this.host = config.host || "127.0.0.1";
+    this.port = config.port || 2003;
+    this.prefix = config.prefix || "";
     this.socket = new Socket();
 
     this.socket.on("close", () => {
@@ -82,7 +89,6 @@ class GraphiteClient extends EventEmitter {
         var metric;
         var prefixFull = "";
         var timestamp;
-        var preparedData = [];
 
         if (this.prefix.length > 0) {
           prefixFull = this.prefix + ".";
@@ -98,37 +104,4 @@ class GraphiteClient extends EventEmitter {
       }
     });
   }
-  // public async send(data: GraphiteRecord[]): Promise<void> {
-  //   return new Promise((resolve, reject) => {
-  //     if (this.connected === true) {
-  //       var row;
-  //       var prefixFull = "";
-  //       var timestamp;
-  //       var preparedData = [];
-
-  //       if (this.prefix.length > 0) {
-  //         prefixFull = this.prefix + ".";
-  //       }
-
-  //       for (var i = 0; i < data.length; i++) {
-  //         timestamp = Math.round(data[i].timestamp / 1000).toString();
-  //         row = `${prefixFull}${data[i].path} ${data[i].value} ${timestamp}\n`;
-  //         // row =
-  //         //   prefixFull +
-  //         //   data[i].path +
-  //         //   " " +
-  //         //   data[i].value +
-  //         //   " " +
-  //         //   timestamp +
-  //         //   "\n";
-  //         preparedData.push(row);
-  //       }
-  //       this.socket.write(preparedData.join(""), () => {
-  //         resolve();
-  //       });
-  //     } else {
-  //       reject("Sending data to Graphite failed.");
-  //     }
-  //   });
-  // }
 }

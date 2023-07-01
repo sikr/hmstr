@@ -1,103 +1,54 @@
-import mqtt from "mqtt";
-import { Persistence } from "./types";
-import persistence from "./data/persistence.json";
-import config from "./conf/dev.conf.json";
+import { Config } from "./types";
+import configJSON from "./conf/dev.conf.json";
+import { MqttClient } from "./mqtt";
 import { GraphiteClient } from "./lib/graphite/graphite";
-import { time } from "console";
+import { Entity } from "./entityWrapper";
+import { EntityWrapper } from "./entityWrapper";
+import { Guard } from "./guard";
 
 const tid = "HMSTR";
+const config: Config = configJSON;
 
 //
-// ensure graceful shutdown
+// Guard handles signals, exceptions and service shutdown
 //
-process.on("SIGTERM", shutdown.bind(null, "SIGTERM"));
-process.on("SIGINT", shutdown.bind(null, "SIGINT"));
-process.on("uncaughtException", function (err) {
-  try {
-    var msg = JSON.stringify(err.stack);
-    console.error(`${tid}: msg`);
-    shutdown.bind(null, "uncaughtException");
-  } catch (e) {
-    process.exit(101);
-  }
-});
+const guard = new Guard(tid);
 
-let p: Persistence = persistence;
+//
+// Entity wrapper/processor
+//
+const entityWrapper = new EntityWrapper();
 
-let graphite: GraphiteClient = new GraphiteClient(
-  config.graphite.host,
-  config.graphite.port,
-  config.graphite.prefix
-);
+//
+// Graphite client to export to
+//
+const graphite: GraphiteClient = new GraphiteClient(config.graphite);
 graphite.connect();
 
-let mqttOptions: mqtt.IClientOptions = {
-  clean: true,
-  // clientId:"mqttjs01",
-  keepalive: 60,
-  password: config.mqtt.password,
-  port: 1883,
-  properties: {
-    requestResponseInformation: true,
-    requestProblemInformation: true,
-  },
-  username: "hmqtt",
-};
-const mqttClient: mqtt.MqttClient = mqtt.connect(
-  `mqtt://${config.mqtt.host}`,
-  mqttOptions
-);
-mqttClient.on("connect", () => {
-  console.info(`${tid}: connected to mqtt ${new Date()}`);
-});
-mqttClient.on("error", (err) => {
-  console.error(`${tid}: MQTT Error - ${err}`);
-});
-mqttClient.subscribe("#", { qos: 1 });
-mqttClient.on(
-  "message",
-  async function (topic: string, message: string, packet: string) {
-    console.log(`${tid}: ${topic}, ${message}, ${packet}`);
-    let messageJson;
-    let timestamp;
-    let value;
+//
+// MQTT client from which the data is received
+//
+const mqtt: MqttClient = new MqttClient(config.mqtt);
+mqtt.connect();
 
-    let device: string;
-    let channel: string;
-    let datapoint: string;
-    let path;
-    let matches: string[] | null;
-    const topicRegEx =
-      /device\/status\/([a-zA-Z0-9]*)\/*(\d*)\/([a-zA-Z0-9_]*)/;
-    matches = topic.match(topicRegEx);
-
-    try {
-      messageJson = JSON.parse(message);
-      value = messageJson.v;
-      timestamp = messageJson.ts;
-
-      if (matches && matches.length === 4) {
-        device = matches[1];
-        channel = matches[2];
-        datapoint = matches[3];
-
-        if (p[device] && p[device][channel] && p[device][channel][datapoint]) {
-          path = p[device][channel][datapoint]["graphite"];
-          await graphite.send({
-            timestamp: timestamp,
-            path: path,
-            value: value,
-          });
-          // console.info(`${tid}: ${path}, ${timestamp}, ${value}`);
-        }
-      }
-    } catch (error) {
-      // console.error(`$[tid}: ${error}`);
+// Export MQTT data to Graphite
+mqtt.on("message", async (topic: string, message: string, packet: object) => {
+  // console.log(`${tid}: ${topic}, ${message}, ${packet}`);
+  try {
+    let e: Entity = entityWrapper.parse(topic, message);
+    if (e && e.graphitePath) {
+      await graphite.send({
+        timestamp: e.timestamp,
+        path: e.graphitePath,
+        value: e.value,
+      });
+      console.log(
+        // `${tid}: device=${e.device}, channel=${e.channel}, datapoint=${e.datapoint}, timestamp=${e.timestamp}, value=${e.value}`
+        `${tid}: ${e.timestamp}, ${e.graphitePath}, ${e.value}`
+      );
     }
+    // console.info(`${tid}: ${path}, ${timestamp}, ${value}`);
+  } catch (error) {
+    // console.error(`$[tid}: ${error}`);
   }
-);
-
-function shutdown(event: string) {
-  console.info(`${tid}: ${event} - shutting down...`);
-  process.exit(1);
-}
+});
