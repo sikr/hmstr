@@ -3,7 +3,7 @@
  */
 import fs from "fs";
 import offsets from "./data/offsets.json";
-import { Persistence } from "./types";
+import { Map } from "./types";
 import { Utils } from "./utils";
 import { Entity } from "./entityWrapper";
 import { ISODate } from "./types";
@@ -34,10 +34,10 @@ const offsetsFile = "./data/offsets.json";
 
 class Offset {
   private offsets: Offsets = offsets;
-  private p: Persistence;
+  private map: Map;
 
-  constructor(persistence: Persistence) {
-    this.p = persistence;
+  constructor(map: Map) {
+    this.map = map;
   }
 
   public exists(e: Entity): Boolean | null {
@@ -52,13 +52,13 @@ class Offset {
   private getPersistedValue(e: Entity): number {
     if (
       e &&
-      this.p[e.device] &&
-      this.p[e.device][e.channel] &&
-      this.p[e.device][e.channel][e.datapoint] &&
-      this.p[e.device][e.channel][e.datapoint].value &&
-      this.p[e.device][e.channel][e.datapoint].value
+      this.map[e.device] &&
+      this.map[e.device][e.channel] &&
+      this.map[e.device][e.channel][e.datapoint] &&
+      this.map[e.device][e.channel][e.datapoint].value &&
+      this.map[e.device][e.channel][e.datapoint].value
     ) {
-      return this.p[e.device][e.channel][e.datapoint].value || 0;
+      return this.map[e.device][e.channel][e.datapoint].value || 0;
     }
     return 0;
   }
@@ -95,7 +95,7 @@ class Offset {
         this.store(
           e,
           Utils.round(
-            this.p[e.device][e.channel][e.datapoint].value!,
+            this.map[e.device][e.channel][e.datapoint].value!,
             this.offsets[e.device][e.channel][e.datapoint].decimals
           ),
           timestamp

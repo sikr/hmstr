@@ -12,8 +12,10 @@ export type Config = {
   mqtt: MqttConfig;
 };
 
-// Persistence file data structure
-export type Persistence = {
+// Map file data structure
+// The map file defines the conjunction between
+// an MQTT topic and its related Graphite path
+export type Map = {
   [device: string]: {
     [channel: string]: {
       [datapoint: string]: {
