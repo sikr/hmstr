@@ -36,7 +36,7 @@ mqtt.connect();
 
 // Export MQTT data to Graphite
 mqtt.on("message", async (topic: string, message: string, packet: object) => {
-  // log.debug(`${tid} ${topic}, ${message}, ${packet}`);
+  // log.debug(`${tid} Receive ${topic}, ${message}, ${packet}`);
   try {
     let e: Entity = entityWrapper.parse(topic, message);
     if (e && e.graphitePath) {
@@ -45,9 +45,11 @@ mqtt.on("message", async (topic: string, message: string, packet: object) => {
         path: e.graphitePath,
         value: e.value,
       });
-      log.verbose(`${tid} ${e.timestamp}, ${e.graphitePath}, ${e.value}`);
+      log.verbose(
+        `${tid} Graphite > ${e.timestamp}, ${e.graphitePath}, ${e.value}`
+      );
     }
   } catch (error) {
-    // log.error(`$[tid} ${error}`);
+    log.error(`$[tid} ${error}`);
   }
 });

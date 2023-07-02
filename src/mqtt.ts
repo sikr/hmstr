@@ -38,10 +38,10 @@ class MqttClient extends EventEmitter {
   public connect() {
     this.client = mqtt.connect(`mqtt://${this.config.host}`, this.options);
     this.client.on("connect", () => {
-      log.info(`${MqttClient.tid} connected to mqtt ${new Date()}`);
+      log.info(`${MqttClient.tid} Connect`);
     });
     this.client.on("error", (err) => {
-      log.error(`${MqttClient.tid} MQTT Error - ${err}`);
+      log.error(`${MqttClient.tid} ${err}`);
     });
     this.client.subscribe("#", { qos: 1 });
     this.client.on("message", (topic, message, packet) => {

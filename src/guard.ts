@@ -21,7 +21,7 @@ class Guard {
     process.on("SIGINT", this.shutdown.bind(this, "SIGINT", ExitCode.SIGINT));
     process.on("uncaughtException", (err) => {
       try {
-        log.error(`${tid} ${JSON.stringify(err.stack)}`);
+        log.error(`${Guard.tid} ${JSON.stringify(err.stack)}`);
         this.shutdown.bind(
           null,
           "uncaughtException",

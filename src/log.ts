@@ -46,16 +46,16 @@ export class Log {
       // mode: 644,
     });
     Log.file.on("open", (fd) => {
-      Log.info(`${this.tid} open`);
+      Log.info(`${this.tid} Open`);
     });
     Log.file.on("close", () => {
-      Log.info(`${this.tid} close`);
+      Log.info(`${this.tid} Close`);
     });
     Log.file.on("error", (err) => {
-      Log.error(`${this.tid} error: ${err.toString()}`);
+      Log.error(`${this.tid} Error: ${err.toString()}`);
     });
     Log.file.on("finish", () => {
-      Log.info(`${this.tid} finish`);
+      Log.info(`${this.tid} Finish`);
     });
   }
   public static async end(message: string) {

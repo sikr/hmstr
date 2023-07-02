@@ -77,12 +77,12 @@ class Offset {
         }
       } catch (err) {
         log.error(
-          `${Offset.tid} Error calculating offset for datapoint ${e.datapoint}`
+          `${Offset.tid} Calculating offset for datapoint ${e.datapoint}`
         );
       }
       return total;
     }
-    log.error(`${Offset.tid} Error entity is undefined`);
+    log.error(`${Offset.tid} Entity is undefined`);
     return 0;
   }
 
@@ -122,12 +122,10 @@ class Offset {
       }
     } catch (err) {
       if (e) {
-        log.error(
-          `${Offset.tid} Error adding offset for datapoint ${e.datapoint}`
-        );
+        log.error(`${Offset.tid} Adding offset for datapoint ${e.datapoint}`);
       } else {
         log.error(
-          `${Offset.tid} Error adding offset for datapoint; entity is undefined`
+          `${Offset.tid} Adding offset for datapoint; entity is undefined`
         );
       }
     }
@@ -140,7 +138,7 @@ class Offset {
         log.debug("${Offset.tid} Data written to file");
       });
     } catch (err) {
-      log.error(`${Offset.tid} Failed to write offsets file. ${err}`);
+      log.error(`${Offset.tid} Write offsets file. ${err}`);
     }
   }
 }
