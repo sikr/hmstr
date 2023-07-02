@@ -7,6 +7,7 @@ import { Map } from "./types";
 import { Utils } from "./utils";
 import { Entity } from "./entityWrapper";
 import { ISODate } from "./types";
+import { Log as log } from "./log";
 
 // Overflow or rest event
 type Event = {
@@ -33,6 +34,7 @@ export { Offset };
 const offsetsFile = "./data/offsets.json";
 
 class Offset {
+  private static tid = "Offset";
   private offsets: Offsets = offsets;
   private map: Map;
 
@@ -74,11 +76,13 @@ class Offset {
           }
         }
       } catch (err) {
-        console.error(`Error calculating offset for datapoint ${e.datapoint}`);
+        log.error(
+          `${Offset.tid} Error calculating offset for datapoint ${e.datapoint}`
+        );
       }
       return total;
     }
-    console.error(`Error entity is undefined`);
+    log.error(`${Offset.tid} Error entity is undefined`);
     return 0;
   }
 
@@ -118,9 +122,13 @@ class Offset {
       }
     } catch (err) {
       if (e) {
-        console.error(`Error adding offset for datapoint ${e.datapoint}`);
+        log.error(
+          `${Offset.tid} Error adding offset for datapoint ${e.datapoint}`
+        );
       } else {
-        console.error(`Error adding offset for datapoint; entity is undefined`);
+        log.error(
+          `${Offset.tid} Error adding offset for datapoint; entity is undefined`
+        );
       }
     }
   }
@@ -129,10 +137,10 @@ class Offset {
     try {
       fs.writeFile(offsetsFile, JSON.stringify(offsets, null, 2), (err) => {
         if (err) throw err;
-        console.log("Data written to file");
+        log.debug("${Offset.tid} Data written to file");
       });
     } catch (err) {
-      console.error(`Failed to write offsets file. ${err}`);
+      log.error(`${Offset.tid} Failed to write offsets file. ${err}`);
     }
   }
 }

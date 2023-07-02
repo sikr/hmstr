@@ -16,7 +16,8 @@
         "-r",
         "tsconfig-paths/register"
       ],
-      "preLaunchTask": "tsc: build - tsconfig.json",
+      // "preLaunchTask": "tsc: build - tsconfig.json && directory",
+      "preLaunchTask": "build",
       "console": "integratedTerminal",
       "outFiles": ["${workspaceFolder}/dist/**/*.js"]
     }

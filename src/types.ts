@@ -4,11 +4,13 @@
 
 // External config definitions
 import { GraphiteConfig } from "./lib/graphite/graphite";
+import { LogConfig } from "./log";
 import { MqttConfig } from "./mqtt";
 
 // Config file data structure
 export type Config = {
   graphite: GraphiteConfig;
+  log: LogConfig;
   mqtt: MqttConfig;
 };
 

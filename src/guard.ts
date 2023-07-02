@@ -1,3 +1,4 @@
+import { Log as log } from "./log";
 export { Guard };
 
 enum ExitCode {
@@ -8,19 +9,19 @@ enum ExitCode {
 }
 
 class Guard {
-  tid: string;
+  private static tid: string;
   constructor(tid: string) {
-    this.tid = tid;
+    tid = tid;
 
     // ensure graceful shutdown
     process.on(
       "SIGTERM",
-      this.shutdown.bind(null, "SIGTERM", ExitCode.SIGTERM)
+      this.shutdown.bind(this, "SIGTERM", ExitCode.SIGTERM)
     );
-    process.on("SIGINT", this.shutdown.bind(null, "SIGINT", ExitCode.SIGINT));
+    process.on("SIGINT", this.shutdown.bind(this, "SIGINT", ExitCode.SIGINT));
     process.on("uncaughtException", (err) => {
       try {
-        console.error(`${tid}: ${JSON.stringify(err.stack)}`);
+        log.error(`${tid} ${JSON.stringify(err.stack)}`);
         this.shutdown.bind(
           null,
           "uncaughtException",
@@ -31,8 +32,9 @@ class Guard {
       }
     });
   }
-  public shutdown(event: string, exitCode: number) {
-    console.info(`${this.tid}: ${event} - shutting down...`);
+  public async shutdown(event: string, exitCode: number) {
+    log.info(`${Guard.tid} ${event} - shutting down...`);
+    await log.end("exit");
     process.exit(exitCode);
   }
 }

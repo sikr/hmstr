@@ -3,6 +3,7 @@
  */
 import mqtt from "mqtt";
 import { EventEmitter } from "stream";
+import { Log as log } from "./log";
 
 export { MqttConfig };
 export { MqttClient };
@@ -13,7 +14,7 @@ interface MqttConfig {
 }
 
 class MqttClient extends EventEmitter {
-  tid = "MQTT";
+  private static tid = "MQTT";
   config: MqttConfig;
   client: mqtt.MqttClient | null = null;
   options: mqtt.IClientOptions;
@@ -37,10 +38,10 @@ class MqttClient extends EventEmitter {
   public connect() {
     this.client = mqtt.connect(`mqtt://${this.config.host}`, this.options);
     this.client.on("connect", () => {
-      console.info(`${this.tid}: connected to mqtt ${new Date()}`);
+      log.info(`${MqttClient.tid} connected to mqtt ${new Date()}`);
     });
     this.client.on("error", (err) => {
-      console.error(`${this.tid}: MQTT Error - ${err}`);
+      log.error(`${MqttClient.tid} MQTT Error - ${err}`);
     });
     this.client.subscribe("#", { qos: 1 });
     this.client.on("message", (topic, message, packet) => {

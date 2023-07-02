@@ -1,5 +1,6 @@
 import { Config } from "./types";
 import configJSON from "./conf/dev.conf.json";
+import { Log as log } from "./log";
 import { MqttClient } from "./mqtt";
 import { GraphiteClient } from "./lib/graphite/graphite";
 import { Entity } from "./entityWrapper";
@@ -8,6 +9,8 @@ import { Guard } from "./guard";
 
 const tid = "HMSTR";
 const config: Config = configJSON;
+
+log.init(config.log);
 
 //
 // Guard handles signals, exceptions and service shutdown
@@ -33,7 +36,7 @@ mqtt.connect();
 
 // Export MQTT data to Graphite
 mqtt.on("message", async (topic: string, message: string, packet: object) => {
-  // console.log(`${tid}: ${topic}, ${message}, ${packet}`);
+  // log.debug(`${tid} ${topic}, ${message}, ${packet}`);
   try {
     let e: Entity = entityWrapper.parse(topic, message);
     if (e && e.graphitePath) {
@@ -42,13 +45,9 @@ mqtt.on("message", async (topic: string, message: string, packet: object) => {
         path: e.graphitePath,
         value: e.value,
       });
-      console.log(
-        // `${tid}: device=${e.device}, channel=${e.channel}, datapoint=${e.datapoint}, timestamp=${e.timestamp}, value=${e.value}`
-        `${tid}: ${e.timestamp}, ${e.graphitePath}, ${e.value}`
-      );
+      log.verbose(`${tid} ${e.timestamp}, ${e.graphitePath}, ${e.value}`);
     }
-    // console.info(`${tid}: ${path}, ${timestamp}, ${value}`);
   } catch (error) {
-    // console.error(`$[tid}: ${error}`);
+    // log.error(`$[tid} ${error}`);
   }
 });

@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "problemMatcher": ["$tsc"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "label": "tsc"
+    },
+    {
+      "type": "shell",
+      "label": "create_log_directory",
+      "windows": {
+        "command": "\"C:\\Program Files\\Git\\usr\\bin\\mkdir.exe\"",
+        "args": ["-p", "./dist/log"]
+      },
+      "linux": {
+        "command": "mkdir",
+        "args": ["-p", "./dist/log"]
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "build",
+      "dependsOn": ["tsc", "create_log_directory"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
