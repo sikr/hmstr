@@ -15,7 +15,7 @@ log.init(config.log);
 //
 // Guard handles signals, exceptions and service shutdown
 //
-const guard = new Guard(tid);
+const guard = Guard.getInstance(tid);
 
 //
 // Entity wrapper/processor

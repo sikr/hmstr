@@ -1,4 +1,6 @@
 import { Log as log } from "./log";
+import { Utils } from "./utils";
+
 export { Guard };
 
 enum ExitCode {
@@ -9,9 +11,10 @@ enum ExitCode {
 }
 
 class Guard {
-  private static tid: string;
-  constructor(tid: string) {
-    tid = tid;
+  private tid: string;
+  private static instance: Guard;
+  private constructor(tid: string) {
+    this.tid = tid;
 
     // ensure graceful shutdown
     process.on(
@@ -21,7 +24,7 @@ class Guard {
     process.on("SIGINT", this.shutdown.bind(this, "SIGINT", ExitCode.SIGINT));
     process.on("uncaughtException", (err) => {
       try {
-        log.error(`${Guard.tid} ${JSON.stringify(err.stack)}`);
+        log.error(`${this.tid} ${JSON.stringify(err.stack)}`);
         this.shutdown.bind(
           null,
           "uncaughtException",
@@ -32,8 +35,16 @@ class Guard {
       }
     });
   }
+  public static getInstance(tid: string) {
+    if (!Guard.instance) {
+      Guard.instance = new Guard(tid);
+    }
+
+    return Guard.instance;
+  }
+
   public async shutdown(event: string, exitCode: number) {
-    log.info(`${Guard.tid} ${event} - shutting down...`);
+    log.info(`${this.tid} ${event} - shutting down...`);
     await log.end("exit");
     process.exit(exitCode);
   }
