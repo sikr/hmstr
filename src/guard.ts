@@ -39,10 +39,20 @@ class Guard {
     if (!Guard.instance) {
       Guard.instance = new Guard(tid);
     }
-
     return Guard.instance;
   }
-
+  public memoryUsage() {
+    let usage = process.memoryUsage();
+    log.info(
+      `${this.tid} Memory rss=${Utils.round(
+        usage.rss / 1024 / 1024,
+        2
+      )}, heapTotal=${Utils.round(
+        usage.heapTotal / 1024 / 1024,
+        2
+      )}, heapUsed=${Utils.round(usage.heapUsed / 1024 / 1024, 2)}`
+    );
+  }
   public async shutdown(event: string, exitCode: number) {
     log.info(`${this.tid} ${event} - shutting down...`);
     await log.end("exit");

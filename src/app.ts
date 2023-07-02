@@ -6,11 +6,24 @@ import { GraphiteClient } from "./lib/graphite/graphite";
 import { Entity } from "./entityWrapper";
 import { EntityWrapper } from "./entityWrapper";
 import { Guard } from "./guard";
+import { CronJob } from "cron";
 
 const tid = "HMSTR";
 const config: Config = configJSON;
 
 log.init(config.log);
+
+//
+// Setup cron job(s)
+//
+const ob = new CronJob(
+  "0 0 * * * *",
+  () => {
+    guard.memoryUsage();
+  },
+  null,
+  true
+);
 
 //
 // Guard handles signals, exceptions and service shutdown

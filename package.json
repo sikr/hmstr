@@ -9,6 +9,8 @@
   "author": "SiKr (simon.kruska@googlemail.com)",
   "license": "ISC",
   "dependencies": {
+    "@types/cron": "^2.0.1",
+    "cron": "^2.3.1",
     "mqtt": "^4.3.7"
   },
   "devDependencies": {
