@@ -22,6 +22,7 @@ export type Entity = {
   value: number;
   offset?: number;
   graphitePath?: string;
+  console?: boolean;
 } | null;
 
 class EntityWrapper {
@@ -61,11 +62,18 @@ class EntityWrapper {
         this.map &&
         this.map[entity.device] &&
         this.map[entity.device][entity.channel] &&
-        this.map[entity.device][entity.channel][entity.datapoint] &&
-        this.map[entity.device][entity.channel][entity.datapoint].graphite
+        this.map[entity.device][entity.channel][entity.datapoint]
       ) {
-        entity.graphitePath =
-          this.map[entity.device][entity.channel][entity.datapoint].graphite;
+        if (
+          this.map[entity.device][entity.channel][entity.datapoint].graphite
+        ) {
+          entity.graphitePath =
+            this.map[entity.device][entity.channel][entity.datapoint].graphite;
+        }
+        if (this.map[entity.device][entity.channel][entity.datapoint].console) {
+          entity.console =
+            this.map[entity.device][entity.channel][entity.datapoint].console;
+        }
       }
       return entity;
     }

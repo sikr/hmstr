@@ -79,6 +79,9 @@ mqtt.on("message", async (topic: string, message: string, packet: object) => {
         `${tid} Graphite > ${e.timestamp}, ${e.graphitePath}, ${e.value}`
       );
     }
+    if (e && e.console) {
+      log.info(`${e.device}/${e.channel}/${e.datapoint}: ${e.value}`);
+    }
   } catch (error) {
     log.error(`$[tid} ${error}`);
   }

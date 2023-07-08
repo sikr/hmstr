@@ -23,6 +23,7 @@ export type Map = {
       [datapoint: string]: {
         graphite: string;
         homematic: string;
+        console?: boolean;
         value?: number;
       };
     };
