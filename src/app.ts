@@ -12,6 +12,12 @@ const tid = "HMSTR";
 const config: Config = configJSON;
 
 log.init(config.log);
+log.info(`${tid} Starting...`);
+
+//
+// Guard handles signals, exceptions and service shutdown
+//
+const guard = Guard.getInstance(tid);
 
 //
 // Setup cron job(s)
@@ -24,11 +30,6 @@ const ob = new CronJob(
   null,
   true
 );
-
-//
-// Guard handles signals, exceptions and service shutdown
-//
-const guard = Guard.getInstance(tid);
 
 //
 // Entity wrapper/processor
