@@ -11,6 +11,9 @@ import { CronJob } from "cron";
 const tid = "HMSTR";
 const config: Config = configJSON;
 
+let minuteReceived = 0;
+let minuteSent = 0;
+
 log.init(config.log);
 log.info(`${tid} Starting...`);
 
@@ -22,10 +25,21 @@ const guard = Guard.getInstance(tid);
 //
 // Setup cron job(s)
 //
-const ob = new CronJob(
+const memoryUsageJob = new CronJob(
   "0 0 * * * *",
   () => {
     guard.memoryUsage();
+  },
+  null,
+  true
+);
+const Stats60sJob = new CronJob(
+  "0 * * * * *",
+  () => {
+    log.info(
+      `${tid} received/sent ${minuteReceived}/${minuteSent} in the last 60 seconds`
+    );
+    minuteReceived = minuteSent = 0;
   },
   null,
   true
@@ -50,6 +64,7 @@ mqtt.connect();
 
 // Export MQTT data to Graphite
 mqtt.on("message", async (topic: string, message: string, packet: object) => {
+  minuteReceived++;
   // log.debug(`${tid} Receive ${topic}, ${message}, ${packet}`);
   try {
     let e: Entity = entityWrapper.parse(topic, message);
@@ -59,6 +74,7 @@ mqtt.on("message", async (topic: string, message: string, packet: object) => {
         path: e.graphitePath,
         value: e.value,
       });
+      minuteSent++;
       log.verbose(
         `${tid} Graphite > ${e.timestamp}, ${e.graphitePath}, ${e.value}`
       );
