@@ -7,6 +7,7 @@ import { Entity } from "./entityWrapper";
 import { EntityWrapper } from "./entityWrapper";
 import { Guard } from "./guard";
 import { CronJob } from "cron";
+import { Rega } from "./rega";
 
 const tid = "HMSTR";
 const config: Config = configJSON;
@@ -44,6 +45,29 @@ const Stats60sJob = new CronJob(
   null,
   true
 );
+
+//
+// Rega
+//
+const rega = Rega.getInstance();
+rega.init(config);
+rega.on("ready", () => {
+  log.info(`${tid} Rega ready`);
+});
+rega.on("down", () => {
+  log.warn(`${tid} Rega down`);
+});
+rega.on("unreachable", () => {
+  log.warn(`${tid} Rega unreachable`);
+});
+const setupRega = async () => {
+  let timeDiff = await rega.checkTime();
+  log.info(`${tid} time difference to CCU: ${timeDiff} s`);
+  rega.load().then((res) => {
+    log.info(`foobar: ${res}`);
+  });
+};
+setupRega();
 
 //
 // Entity wrapper/processor
