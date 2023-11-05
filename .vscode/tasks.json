@@ -13,14 +13,14 @@
     },
     {
       "type": "shell",
-      "label": "create_log_directory",
+      "label": "create_and_copy",
       "windows": {
-        "command": "\"C:\\Program Files\\Git\\usr\\bin\\mkdir.exe\"",
-        "args": ["-p", "./dist/log"]
+        "command": "${workspaceFolder}\\src\\scripts\\create_and_copy.cmd",
+        "args": ["${workspaceFolder}"]
       },
       "linux": {
-        "command": "mkdir",
-        "args": ["-p", "./dist/log"]
+        "command": "${workspaceFolder}/src/scripts/create_and_copy.sh",
+        "args": ["${workspaceFolder}"]
       },
       "group": {
         "kind": "build",
@@ -29,7 +29,7 @@
     },
     {
       "label": "build",
-      "dependsOn": ["tsc", "create_log_directory"],
+      "dependsOn": ["create_and_copy", "tsc"],
       "group": {
         "kind": "build",
         "isDefault": true

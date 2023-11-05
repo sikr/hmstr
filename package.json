@@ -4,6 +4,8 @@
   "description": "Obtain smarthome data via MQTT and forward it to Graphite Carbon Cache",
   "main": "app.js",
   "scripts": {
+    "build": "npx tsc",
+    "prebuild": "node src/scripts/setup.js ./",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "SiKr (simon.kruska@googlemail.com)",
@@ -11,11 +13,13 @@
   "dependencies": {
     "@types/cron": "^2.0.1",
     "cron": "^2.3.1",
-    "mqtt": "^4.3.7"
+    "mqtt": "^4.3.7",
+    "xml2js": "^0.6.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
     "@types/ws": "^8.5.4",
+    "@types/xml2js": "^0.4.11",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.3"

@@ -7,11 +7,23 @@ import { GraphiteConfig } from "./lib/graphite/graphite";
 import { LogConfig } from "./log";
 import { MqttConfig } from "./mqtt";
 
+export interface CcuConfig {
+  host: string;
+}
+
+export interface SslConfig {
+  ca: string;
+  cert: string;
+  key: string;
+}
+
 // Config file data structure
 export type Config = {
+  ccu: CcuConfig;
   graphite: GraphiteConfig;
   log: LogConfig;
   mqtt: MqttConfig;
+  ssl: SslConfig;
 };
 
 // Map file data structure
