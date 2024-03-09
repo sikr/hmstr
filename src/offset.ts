@@ -2,12 +2,15 @@
  *  Offset processing
  */
 import fs from "fs";
-import offsets from "./data/offsets.json";
-import { Map } from "./types";
-import { Utils } from "./utils";
 import { Entity } from "./entityWrapper";
 import { ISODate } from "./types";
 import { Log as log } from "./log";
+import { Map } from "./types";
+import { MeasurementCache } from "./measurementCache";
+import { Utils } from "./utils";
+
+import offsets from "./data/offsets.json";
+const offsetsFile = "./dist/data/offsets.json";
 
 // Overflow or rest event
 type Event = {
@@ -31,18 +34,28 @@ export type Offsets = {
 
 export { Offset };
 
-const offsetsFile = "./data/offsets.json";
-
 class Offset {
+  private cache: MeasurementCache;
   private static tid = "Offset";
   private offsets: Offsets = offsets;
   private map: Map;
 
   constructor(map: Map) {
+    this.cache = new MeasurementCache();
     this.map = map;
   }
 
-  public exists(e: Entity): Boolean | null {
+  public process(e: Entity): Boolean | null {
+    if (e && this.exists(e)) {
+      let overflowOrReset = this.detect(e);
+      e.offset = this.getTotal(e);
+      e.value = e.value + e.offset;
+      return overflowOrReset;
+    }
+    return null;
+  }
+
+  private exists(e: Entity): Boolean | null {
     return (
       e &&
       this.offsets[e.device] !== undefined &&
@@ -51,21 +64,7 @@ class Offset {
     );
   }
 
-  private getPersistedValue(e: Entity): number {
-    if (
-      e &&
-      this.map[e.device] &&
-      this.map[e.device][e.channel] &&
-      this.map[e.device][e.channel][e.datapoint] &&
-      this.map[e.device][e.channel][e.datapoint].value &&
-      this.map[e.device][e.channel][e.datapoint].value
-    ) {
-      return this.map[e.device][e.channel][e.datapoint].value || 0;
-    }
-    return 0;
-  }
-
-  public getTotal(e: Entity): number {
+  private getTotal(e: Entity): number {
     let total = 0;
     if (e) {
       try {
@@ -86,25 +85,22 @@ class Offset {
     return 0;
   }
 
-  public checkOverflowOrReset(
-    e: Entity,
-    currentValue: number,
-    timestamp: Date
-  ) {
+  private detect(e: Entity) {
     if (e) {
-      let previousValue = this.getPersistedValue(e);
-      if (previousValue && currentValue < previousValue) {
-        // current value is less than former value, which indicates
-        // overflow or reset (e. g. battery exchange)
-        this.store(
-          e,
-          Utils.round(
-            this.map[e.device][e.channel][e.datapoint].value!,
-            this.offsets[e.device][e.channel][e.datapoint].decimals
-          ),
-          timestamp
-        );
-        return true;
+      let previous = this.cache.get(e);
+      this.cache.put(e);
+      if (previous) {
+        if (previous > e.value) {
+          this.store(
+            e,
+            Utils.round(
+              previous,
+              this.offsets[e.device][e.channel][e.datapoint].decimals
+            ),
+            new Date()
+          );
+          return true;
+        }
       }
     }
     return false;
