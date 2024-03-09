@@ -78,6 +78,9 @@ const entityWrapper = new EntityWrapper();
 // Graphite client to export to
 //
 const graphite: GraphiteClient = new GraphiteClient(config.graphite);
+graphite.on("error", (error: Error) => {
+  log.error(`GRAPHITE: ${JSON.stringify(error)}`);
+});
 graphite.connect();
 
 //
@@ -90,23 +93,24 @@ mqtt.connect();
 mqtt.on("message", async (topic: string, message: string, packet: object) => {
   minuteReceived++;
   // log.debug(`${tid} Receive ${topic}, ${message}, ${packet}`);
-  try {
-    let e: Entity = entityWrapper.parse(topic, message);
-    if (e && e.graphitePath) {
-      await graphite.send({
+  let e: Entity = entityWrapper.parse(topic, message);
+  if (e && e.graphitePath) {
+    await graphite
+      .send({
         timestamp: e.timestamp,
         path: e.graphitePath,
         value: e.value,
+      })
+      .catch((error) => {
+        // log.error(`GRAPHITE: ${error}`);
+        log.error(`${tid}: ${error}`);
       });
-      minuteSent++;
-      log.verbose(
-        `${tid} Graphite > ${e.timestamp}, ${e.graphitePath}, ${e.value}`
-      );
-    }
-    if (e && e.console) {
-      log.info(`${e.device}/${e.channel}/${e.datapoint}: ${e.value}`);
-    }
-  } catch (error) {
-    log.error(`$[tid} ${error}`);
+    minuteSent++;
+    log.verbose(
+      `${tid} Graphite > ${e.timestamp}, ${e.graphitePath}, ${e.value}`
+    );
+  }
+  if (e && e.console) {
+    log.info(`${e.device}/${e.channel}/${e.datapoint}: ${e.value}`);
   }
 });
