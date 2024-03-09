@@ -8,11 +8,11 @@
  *  The mapping is taken from and defined in ./data/map.json
  *
  */
-import { Offset } from "./offset";
 import { Map } from "./types";
-import mapJSON from "./data/map.json";
+import { MeasurementCache } from "./measurementCache";
+import { Offset } from "./offset";
 
-export { EntityWrapper };
+import mapJSON from "./data/map.json";
 
 export type Entity = {
   device: string;
@@ -25,38 +25,37 @@ export type Entity = {
   console?: boolean;
 } | null;
 
-class EntityWrapper {
+export class EntityWrapper {
+  cache: MeasurementCache[];
   map: Map;
-  offsets: Offset;
+  offset: Offset;
 
   constructor() {
+    this.cache = [];
     this.map = mapJSON;
-    this.offsets = new Offset(this.map);
+    this.offset = new Offset(this.map);
   }
   public parse(mqttTopic: string, mqttMessage: string): Entity {
     let entity: Entity;
     const topicRegEx =
-      /device\/status\/([a-zA-Z0-9]*)\/*(\d*)\/([a-zA-Z0-9_]*)/;
+      /(device|virtdev)\/status\/([a-zA-Z0-9]*)\/(\d*)\/([a-zA-Z0-9_]*)/;
 
     // dissect topic, example: 'device/status/ABC1234567/1/CHANNEL_NAME'
     let groups = mqttTopic.match(topicRegEx);
-    if (groups && groups.length === 4) {
+    if (groups && groups.length === 5) {
       // parse json message, example: '{"ts":1688224943273,"v":23.5,"s":0}'
       let messageJson = JSON.parse(mqttMessage);
 
       entity = {
-        device: groups[1],
-        channel: parseInt(groups[2], 10),
-        datapoint: groups[3],
+        device: groups[2],
+        channel: parseInt(groups[3], 10),
+        datapoint: groups[4],
         timestamp: messageJson.ts,
         value: messageJson.v,
       };
-      // if an offset is defined, append it to
-      // the entity and add it to its value
-      if (this.offsets.exists(entity)) {
-        entity.offset = this.offsets.getTotal(entity);
-        entity.value = messageJson.v + entity.offset;
-      }
+
+      this.offset.process(entity);
+
       // add graphite path if available
       if (
         this.map &&
@@ -78,27 +77,5 @@ class EntityWrapper {
       return entity;
     }
     return null;
-  }
-  isPersistable(e: Entity) {}
-  public getChannelNumber(e: Entity): number {
-    if (e && e.channel) {
-      return e.channel;
-    } else {
-      return 0;
-    }
-  }
-  public getDatapointName(e: Entity): string {
-    if (e && e.datapoint) {
-      return e.datapoint;
-    } else {
-      return "";
-    }
-  }
-  public getValue(e: Entity): number {
-    if (e && e.value) {
-      return e.value;
-    } else {
-      return 0;
-    }
   }
 }
