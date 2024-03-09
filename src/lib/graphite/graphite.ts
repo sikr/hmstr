@@ -22,7 +22,7 @@ class GraphiteClient extends EventEmitter {
   host: string;
   port: number;
   prefix: string;
-  reconnectTimeout: number = 10;
+  reconnectTimeout: number = 10000;
   socket: Socket;
 
   constructor(config: GraphiteConfig) {
@@ -46,8 +46,8 @@ class GraphiteClient extends EventEmitter {
       this.OnDrain();
     });
 
-    this.socket.on("error", () => {
-      this.OnError();
+    this.socket.on("error", (error: Error) => {
+      this.OnError(error);
     });
   }
 
@@ -77,7 +77,9 @@ class GraphiteClient extends EventEmitter {
 
   private OnDrain(): void {}
 
-  private OnError(): void {}
+  private OnError(error: Error): void {
+    this.emit("error", error);
+  }
 
   public isConnected(): boolean {
     return false;
@@ -100,7 +102,7 @@ class GraphiteClient extends EventEmitter {
           resolve();
         });
       } else {
-        reject("Sending data to Graphite failed.");
+        reject("Sending data to Graphite failed. Carbon Cache down?");
       }
     });
   }
