@@ -15,12 +15,12 @@
       "type": "shell",
       "label": "create_and_copy",
       "windows": {
-        "command": "${workspaceFolder}\\src\\scripts\\create_and_copy.cmd",
-        "args": ["${workspaceFolder}"]
+        "command": "node.exe",
+        "args": ["${workspaceFolder}\\src\\scripts\\setup.js", ".\\"]
       },
       "linux": {
-        "command": "${workspaceFolder}/src/scripts/create_and_copy.sh",
-        "args": ["${workspaceFolder}"]
+        "command": "node",
+        "args": ["${workspaceFolder}/src/scripts/setup.js", "./"]
       },
       "group": {
         "kind": "build",
