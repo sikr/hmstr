@@ -10,7 +10,7 @@ import { MeasurementCache } from "./measurementCache";
 import { Utils } from "./utils";
 
 import offsets from "./data/offsets.json";
-const offsetsFile = "./dist/data/offsets.json";
+const offsetsFile = "./data/offsets.json";
 
 // Overflow or rest event
 type Event = {
