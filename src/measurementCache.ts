@@ -32,13 +32,13 @@ export class MeasurementCache {
     if (entity) {
       for (let i = 0; i < this.cache.length; i++) {
         if (this.cache[i].device === entity.device) {
-          this.cache[i].value = entity.value;
+          this.cache[i].value = entity.value as number;
           return;
         }
       }
       this.cache.push({
         device: entity.device,
-        value: entity.value,
+        value: entity.value as number,
       });
     }
   }

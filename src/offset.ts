@@ -49,7 +49,7 @@ class Offset {
     if (e && this.exists(e)) {
       let overflowOrReset = this.detect(e);
       e.offset = this.getTotal(e);
-      e.value = e.value + e.offset;
+      e.value = (e.value as number) + e.offset;
       return overflowOrReset;
     }
     return null;
@@ -90,7 +90,7 @@ class Offset {
       let previous = this.cache.get(e);
       this.cache.put(e);
       if (previous) {
-        if (previous > e.value) {
+        if (previous > (e.value as number)) {
           this.store(
             e,
             Utils.round(
