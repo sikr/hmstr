@@ -9,8 +9,8 @@ import { Map } from "./types";
 import { MeasurementCache } from "./measurementCache";
 import { Utils } from "./utils";
 
-import offsets from "./data/offsets.json";
-const offsetsFile = "./data/offsets.json";
+import offset from "./data/offset.json";
+const offsetFile = "./data/offset.json";
 
 // Overflow or rest event
 type Event = {
@@ -19,8 +19,8 @@ type Event = {
   value: number;
 };
 
-// Offsets file data structure
-export type Offsets = {
+// OffsetJson file data structure
+export type OffsetJson = {
   [device: string]: {
     [channel: string]: {
       [datapoint: string]: {
@@ -37,7 +37,7 @@ export { Offset };
 class Offset {
   private cache: MeasurementCache;
   private static tid = "Offset";
-  private offsets: Offsets = offsets;
+  private offset: OffsetJson = offset;
   private map: Map;
 
   constructor(map: Map) {
@@ -58,9 +58,9 @@ class Offset {
   private exists(e: Entity): Boolean | null {
     return (
       e &&
-      this.offsets[e.device] !== undefined &&
-      this.offsets[e.device][e.channel] !== undefined &&
-      this.offsets[e.device][e.channel][e.datapoint] !== undefined
+      this.offset[e.device] !== undefined &&
+      this.offset[e.device][e.channel] !== undefined &&
+      this.offset[e.device][e.channel][e.datapoint] !== undefined
     );
   }
 
@@ -69,7 +69,7 @@ class Offset {
     if (e) {
       try {
         if (this.exists(e)) {
-          let events = this.offsets[e.device][e.channel][e.datapoint].events;
+          let events = this.offset[e.device][e.channel][e.datapoint].events;
           for (var i in events) {
             total += events[i].value;
           }
@@ -95,7 +95,7 @@ class Offset {
             e,
             Utils.round(
               previous,
-              this.offsets[e.device][e.channel][e.datapoint].decimals
+              this.offset[e.device][e.channel][e.datapoint].decimals
             ),
             new Date()
           );
@@ -109,7 +109,7 @@ class Offset {
   private store(e: Entity, offset: number, timestamp: Date) {
     try {
       if (e && this.exists(e)) {
-        this.offsets[e.device][e.channel][e.datapoint].events.push({
+        this.offset[e.device][e.channel][e.datapoint].events.push({
           comment: "automatically captured overflow or reset",
           date: timestamp.toISOString(),
           value: offset,
@@ -129,12 +129,12 @@ class Offset {
 
   private writeFile() {
     try {
-      fs.writeFile(offsetsFile, JSON.stringify(offsets, null, 2), (err) => {
+      fs.writeFile(offsetFile, JSON.stringify(offset, null, 2), (err) => {
         if (err) throw err;
         log.debug("${Offset.tid} Data written to file");
       });
     } catch (err) {
-      log.error(`${Offset.tid} Write offsets file. ${err}`);
+      log.error(`${Offset.tid} Writing offset file: ${err}`);
     }
   }
 }
