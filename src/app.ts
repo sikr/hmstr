@@ -99,7 +99,7 @@ mqtt.on("message", async (topic: string, message: string, packet: object) => {
       .send({
         timestamp: e.timestamp,
         path: e.graphitePath,
-        value: e.value,
+        value: e.value as number,
       })
       .catch((error) => {
         // log.error(`GRAPHITE: ${error}`);

@@ -19,7 +19,7 @@ export type Entity = {
   channel: number;
   datapoint: string;
   timestamp: number;
-  value: number;
+  value: number | boolean;
   offset?: number;
   graphitePath?: string;
   console?: boolean;
