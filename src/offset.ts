@@ -36,7 +36,7 @@ export { Offset };
 
 class Offset {
   private cache: MeasurementCache;
-  private static tid = "Offset";
+  private static tid = "OFFSET";
   private offset: OffsetJson = offset;
   private map: Map;
 

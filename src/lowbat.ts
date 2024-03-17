@@ -44,7 +44,7 @@ export type LowbatJson = {
 
 export class Lowbat {
   private static instance: Lowbat;
-  private static tid = "Offset";
+  private static tid = "LOWBAT";
   private static lowbat: LowbatJson = lowbat;
 
   private constructor() {}
