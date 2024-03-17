@@ -79,10 +79,17 @@ export class Lowbat {
             // discard jitter
             event.replacement = "";
             modified = true;
+            log.info(
+              `${Lowbat.tid} ${e.device} battery low jitter detected.`
+            );
           } else {
             // stringify battery duration
             if (event && date) {
               event.duration = Utils.getHumanReadableTimeSpan(now, date);
+              log.info(
+                `${Lowbat.tid} ${e.device} determined battery duration is ` +
+                `${event.duration}.`
+              );
             }
             // new lowbat event
             this.lowbat[e.device].events.push({
@@ -90,6 +97,7 @@ export class Lowbat {
               duration: "",
             });
             modified = true;
+            log.info(`${Lowbat.tid} ${e.device} reports lowbat.`);
           }
         }
       } else {
@@ -102,6 +110,9 @@ export class Lowbat {
             // battery replaced
             event.replacement = now.toISOString();
             modified = true;
+            log.info(
+              `${Lowbat.tid} ${e.device} battery has been replaced.`
+            );
           }
         }
       }
