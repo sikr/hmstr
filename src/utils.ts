@@ -31,6 +31,33 @@ class Utils {
       this.fill(d.getSeconds().toString(), 2)
     );
   }
+  public static getHumanReadableTimeSpan = function (
+    begin: Date,
+    end: Date
+  ): String {
+    if (begin && end) {
+      let delta =
+        Math.abs(end.getMilliseconds() - begin.getMilliseconds()) / 1000;
+      let days = Math.floor(delta / 86400);
+      delta -= days * 86400;
+      let hours = Math.floor(delta / 3600) % 24;
+      delta -= hours * 3600;
+      let minutes = Math.floor(delta / 60) % 60;
+      delta -= minutes * 60;
+      let seconds = Math.round(delta);
+      return (
+        days +
+        " days, " +
+        hours +
+        " hours, " +
+        minutes +
+        " minutes, " +
+        seconds +
+        " seconds"
+      );
+    }
+    return "";
+  };
   private static fill(text: string, length: number) {
     let s = "";
     while (text.length + s.length < length) {
