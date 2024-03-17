@@ -11,6 +11,7 @@
 import { Map } from "./types";
 import { MeasurementCache } from "./measurementCache";
 import { Offset } from "./offset";
+import { Lowbat } from "./lowbat";
 
 import mapJSON from "./data/map.json";
 
@@ -54,7 +55,11 @@ export class EntityWrapper {
         value: messageJson.v,
       };
 
-      this.offset.process(entity);
+      if (entity.datapoint === "LOWBAT") {
+        Lowbat.handle(entity);
+      } else {
+        this.offset.process(entity);
+      }
 
       // add graphite path if available
       if (
