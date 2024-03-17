@@ -1,5 +1,5 @@
 import { Config } from "./types";
-import configJSON from "./conf/dev.conf.json";
+import configJSON from "./conf/conf.json";
 import { Log as log } from "./log";
 import { MqttClient } from "./mqtt";
 import { GraphiteClient } from "./lib/graphite/graphite";

@@ -1,4 +1,5 @@
 {
+    "description": "Development|Test|Productive instance",
     "ccu": {
         "host": "192.168.1.3"
     },
