@@ -11,18 +11,18 @@
     "author": "SiKr (simon.kruska@googlemail.com)",
     "license": "ISC",
     "dependencies": {
-        "cron": "^2.3.1",
-        "mqtt": "^4.3.7",
-        "xml2js": "^0.6.0"
+        "cron": "^2.4.4",
+        "mqtt": "^4.3.8",
+        "xml2js": "^0.6.2"
     },
     "devDependencies": {
-        "@types/cron": "^2.0.1",
-        "@types/node": "^18.15.11",
-        "@types/ws": "^8.5.4",
-        "@types/xml2js": "^0.4.11",
-        "ts-node": "^10.9.1",
+        "@types/cron": "^2.4.0",
+        "@types/node": "^18.19.26",
+        "@types/ws": "^8.5.10",
+        "@types/xml2js": "^0.4.14",
+        "ts-node": "^10.9.2",
         "tsconfig-paths": "^4.2.0",
-        "typescript": "^5.0.3"
+        "typescript": "^5.4.3"
     },
     "prettier": {
         "overrides": [
