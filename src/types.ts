@@ -26,10 +26,10 @@ export type Config = {
   ssl: SslConfig;
 };
 
-// Map file data structure
-// The map file defines the conjunction between
-// an MQTT topic and its related Graphite path
-export type Map = {
+// Homematic map file data structure
+// The map file defines the conjunction between a Homematic MQTT topic and its
+// related Graphite path.
+export type HomematicMap = {
   [device: string]: {
     [channel: string]: {
       [datapoint: string]: {
@@ -39,6 +39,22 @@ export type Map = {
         value?: number;
       };
     };
+  };
+};
+
+// Shelly map file data structure
+// The map file defines the conjunction between a Shelly MQTT topic and its
+// related Graphite path.
+export type ShellyMap = {
+  [device: string]: {
+  //   [channel: string]: {
+  //     [datapoint: string]: {
+         graphite: string;
+  //       homematic: string;
+  //       console?: boolean;
+  //       value?: number;
+  //     };
+  //   };
   };
 };
 
