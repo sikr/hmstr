@@ -5,7 +5,7 @@ import fs from "fs";
 import { Entity } from "./entityWrapper";
 import { ISODate } from "./types";
 import { Log as log } from "./log";
-import { Map } from "./types";
+import { HomematicMap } from "./types";
 import { MeasurementCache } from "./measurementCache";
 import { Utils } from "./utils";
 
@@ -38,9 +38,9 @@ class Offset {
   private cache: MeasurementCache;
   private static tid = "OFFSET";
   private offset: OffsetJson = offset;
-  private map: Map;
+  private map: HomematicMap;
 
-  constructor(map: Map) {
+  constructor(map: HomematicMap) {
     this.cache = new MeasurementCache();
     this.map = map;
   }
