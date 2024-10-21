@@ -17,13 +17,27 @@ export interface SslConfig {
   key: string;
 }
 
+export interface GoEChargerConfig {
+  host: string;
+  port: number;
+}
+
 // Config file data structure
 export type Config = {
   ccu: CcuConfig;
+  goecharger: GoEChargerConfig;
   graphite: GraphiteConfig;
   log: LogConfig;
   mqtt: MqttConfig;
   ssl: SslConfig;
+};
+
+export type Datapoint = {
+  graphite: string;
+  console?: boolean;
+  description?: string;
+  homematic?: string;
+  value?: number;
 };
 
 // Homematic map file data structure
@@ -32,12 +46,7 @@ export type Config = {
 export type HomematicMap = {
   [device: string]: {
     [channel: string]: {
-      [datapoint: string]: {
-        graphite: string;
-        homematic: string;
-        console?: boolean;
-        value?: number;
-      };
+      [datapoint: string]: Datapoint;
     };
   };
 };
@@ -46,16 +55,7 @@ export type HomematicMap = {
 // The map file defines the conjunction between a Shelly MQTT topic and its
 // related Graphite path.
 export type ShellyMap = {
-  [device: string]: {
-  //   [channel: string]: {
-  //     [datapoint: string]: {
-         graphite: string;
-  //       homematic: string;
-  //       console?: boolean;
-  //       value?: number;
-  //     };
-  //   };
-  };
+  [device: string]: Datapoint
 };
 
 // Homematic devices json/file data structure
@@ -70,6 +70,13 @@ export type HomematicDevices = {
     Interface: string;
     Channels: number[];
   };
+};
+
+// go-eCharger map file data structure
+// The map file defines the conjunction between a go-eCharger datagram and its
+// related Graphite path.
+export type GoEMap = {
+  [dp: string]: Datapoint | Datapoint[]
 };
 
 // Homematic channels json/file data structure

@@ -85,24 +85,27 @@ class GraphiteClient extends EventEmitter {
     return false;
   }
 
-  public async send(data: GraphiteRecord): Promise<void> {
+  public async send(data: GraphiteRecord[]): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.connected === true) {
         var metric;
         var prefixFull = "";
         var timestamp;
+        var metrics: string[] = [];
 
         if (this.prefix.length > 0) {
           prefixFull = this.prefix + ".";
         }
-
-        timestamp = Math.round(data.timestamp / 1000).toString();
-        metric = `${prefixFull}${data.path} ${data.value} ${timestamp}\n`;
-        this.socket.write(metric, () => {
-          resolve();
+        data.forEach((d) => {
+          timestamp = Math.round(d.timestamp / 1000).toString();
+          metrics.push(`${prefixFull}${d.path} ${d.value} ${timestamp}\n`);
         });
+        if (metrics.length > 0) {
+          this.socket.write(metrics.join(""), () => {});
+        }
+        resolve();
       } else {
-        reject("Sending data to Graphite failed. Carbon Cache down?");
+        reject("Sending data to Graphite failed.");
       }
     });
   }

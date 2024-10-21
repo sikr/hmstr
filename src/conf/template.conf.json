@@ -8,6 +8,10 @@
         "port": 2003,
         "prefix": ""
     },
+    "goecharger": {
+        "host": "192.168.1.5",
+        "port": 80
+    },
     "log": {
         "console": {
             "level": 3,

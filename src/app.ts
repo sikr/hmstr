@@ -3,6 +3,7 @@ import configJSON from "./conf/conf.json";
 import { Log as log } from "./log";
 import { MqttClient } from "./mqtt";
 import { GraphiteClient } from "./lib/graphite/graphite";
+import { GoEClient } from "./go_e";
 import { Entity } from "./entityWrapper";
 import { EntityWrapper } from "./entityWrapper";
 import { Guard } from "./guard";
@@ -30,6 +31,14 @@ const memoryUsageJob = new CronJob(
   "0 0 * * * *",
   () => {
     guard.memoryUsage();
+  },
+  null,
+  true
+);
+const goEJob = new CronJob(
+  "0,15,30,45 * * * * *",
+  () => {
+    go_e.poll();
   },
   null,
   true
@@ -89,6 +98,11 @@ graphite.connect();
 const mqtt: MqttClient = new MqttClient(config.mqtt);
 mqtt.connect();
 
+// 
+// Go-E Charger
+// 
+const go_e = new GoEClient(config, graphite);
+
 // Export MQTT data to Graphite
 mqtt.on("message", async (topic: string, message: string, packet: object) => {
   minuteReceived++;
@@ -96,11 +110,11 @@ mqtt.on("message", async (topic: string, message: string, packet: object) => {
   let e: Entity = entityWrapper.parse(topic, message);
   if (e && e.graphitePath) {
     await graphite
-      .send({
+      .send([{
         timestamp: e.timestamp,
         path: e.graphitePath,
         value: e.value as number,
-      })
+      }])
       .catch((error) => {
         // log.error(`GRAPHITE: ${error}`);
         log.error(`${tid}: ${error}`);
