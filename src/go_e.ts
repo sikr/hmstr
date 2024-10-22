@@ -31,7 +31,7 @@ export class GoEClient {
     this.requestOptions = {
       hostname: this.config?.goecharger.host,
       port: this.config?.goecharger.port,
-      path: "/api/status?filter=eto,wh,nrg,amp",
+      path: "/api/status?filter=eto,wh,nrg,amp,tma",
       method: "GET",
     };
   }
